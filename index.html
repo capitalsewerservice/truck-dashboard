@@ -1,22 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Truck Power Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <label for="dateInput">Select Date:</label>
-  <input type="date" id="dateInput">
+  <header>
+    <h1>Truck Power Monitoring Dashboard</h1>
+    <div class="toolbar">
+      <label for="dateInput">Select Date:</label>
+      <input type="date" id="dateInput" />
+    </div>
+  </header>
 
-  <h1>Truck Power Dashboard</h1>
-  <div class="chart-container"><canvas id="vaChart"></canvas></div>
-  <div class="chart-container"><canvas id="peakChart"></canvas></div>
-  <div class="chart-container"><canvas id="kvahChart"></canvas></div>
-  <div class="chart-container"><canvas id="weeklyChart"></canvas></div>
-  <div class="chart-container"><canvas id="liveGaugeChart"></canvas></div>
+  <main class="grid-container">
+    <section class="card">
+      <h2>Voltage / VA (L1 & L2)</h2>
+      <canvas id="vaChart"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Peak Current (L1 & L2)</h2>
+      <canvas id="peakChart"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Total kVAh</h2>
+      <canvas id="kvahChart"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Daily kVAh (Weekly Trend)</h2>
+      <canvas id="weeklyChart"></canvas>
+    </section>
+
+    <section class="card gauge-card">
+      <h2>Live L1 VA</h2>
+      <canvas id="liveGaugeChart"></canvas>
+    </section>
+  </main>
+
+  <footer>
+    <p>Powered by Google Sheets & GitHub Pages | © 2025</p>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
