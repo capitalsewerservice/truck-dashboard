@@ -13,18 +13,18 @@ let gaugeChartInstance = null;
 async function fetchData() {
   try {
     const response = await fetch(API_URL);
-    // ASSUMING THE API RETURNS AN OBJECT WITH A 'data' KEY, e.g., { "data": [...] }
-    const result = await response.json(); 
+    // EXPECTING A DIRECT ARRAY AS RESPONSE, NOT AN OBJECT WITH A 'data' KEY
+    const rawDataArray = await response.json(); 
 
-    if (result.error) {
-      throw new Error(`API Error: ${result.error}`);
+    // Basic validation to ensure it's an array
+    if (!Array.isArray(rawDataArray)) {
+      throw new Error("API did not return an array of data. Check your Google Apps Script output format.");
     }
 
     // Process raw data: parse timestamps, convert numbers
-    // This line correctly accesses the 'data' array from the returned object
-    const processedData = result.data.map(row => { 
-      // Use moment.js to parse the specific timestamp format
-      const timestamp = moment(row.Timestamp, 'YYYY/M/D H:m:s').toDate(); // Your sheet format
+    const processedData = rawDataArray.map(row => { 
+      // Use moment.js to parse ISO 8601 timestamp (e.g., "2025-07-04T19:10:36.000Z")
+      const timestamp = moment(row.Timestamp).toDate(); 
       return {
         ...row,
         Timestamp: timestamp,
@@ -33,9 +33,9 @@ async function fetchData() {
         L1_VA: parseFloat(row.L1_VA) || 0,
         L2_I_A: parseFloat(row.L2_I_A) || 0,
         L2_VA: parseFloat(row.L2_VA) || 0,
-        // Corrected column names for peak values
-        L1_Peak_I_A: parseFloat(row.L1_Peak_I_A) || 0,
-        L2_Peak_I_A: parseFloat(row.L2_Peak_I_A) || 0,
+        // Corrected column names to match your JSON output (lowercase 'l')
+        L1_Peak_I_A: parseFloat(row.l1_peak_i_a) || 0, 
+        L2_Peak_I_A: parseFloat(row.l2_peak_i_a) || 0, 
         Total_VA: parseFloat(row.Total_VA) || 0,
         Total_kVAh: parseFloat(row.Total_kVAh) || 0,
         Daily_kVAh: parseFloat(row.Daily_kVAh) || 0,
@@ -70,8 +70,8 @@ function processDailyData(data) {
   });
 
   // Calculate daily peak VA for the peak chart (max for the entire day)
-  const L1_VA_Peak = Math.max(...data.map(d => d.L1_VA));
-  const L2_VA_Peak = Math.max(...data.map(d => d.L2_VA));
+  const L1_VA_Peak = Math.max(...data.map(d => d.L1_Peak_I_A)); // Uses the corrected processed field name
+  const L2_VA_Peak = Math.max(...data.map(d => d.L2_Peak_I_A)); // Uses the corrected processed field name
 
   return { progressiveData, L1_VA_Peak, L2_VA_Peak };
 }
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial load of the dashboard
   initializeDashboard();
 
-  // Setup auto-refresh every 60 seconds (re-enabled as it was not the cause of the glitch)
+  // Setup auto-refresh every 60 seconds (re-enabled as it was not the cause of the glitch once charts destroy correctly)
   setInterval(() => {
     // Re-fetch all data and then re-initialize with current selection
     allData = []; // Clear current data to force a fresh fetch
