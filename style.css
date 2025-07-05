@@ -67,6 +67,5 @@ footer {
 
 canvas {
   max-width: 100%;
-  /* This fixed height is crucial for controlling chart growth */
-  height: 250px; /* Adjust this value as needed for your desired chart height */
+  height: 250px; /* Example fixed height for all charts, adjust as needed */
 }

@@ -13,20 +13,15 @@ let gaugeChartInstance = null;
 async function fetchData() {
   try {
     const response = await fetch(API_URL);
-    // Assuming the API returns a plain array directly, not an object with a 'data' key
-    const dataArray = await response.json(); 
+    // Assuming the API returns an object with a 'data' key as confirmed previously
+    const result = await response.json();
 
-    // Basic validation: ensure we received an array
-    if (!Array.isArray(dataArray)) {
-        // If it's an object with an 'error' key, handle it
-        if (dataArray && typeof dataArray === 'object' && dataArray.error) {
-            throw new Error(`API Error: ${dataArray.error}`);
-        }
-        throw new Error("Invalid data format received from API. Expected a JSON array.");
+    if (result.error) {
+      throw new Error(`API Error: ${result.error}`);
     }
 
     // Process raw data: parse timestamps, convert numbers
-    const processedData = dataArray.map(row => { // Now 'dataArray' is the array to map
+    const processedData = result.data.map(row => {
       // Use moment.js to parse the specific timestamp format
       const timestamp = moment(row.Timestamp, 'YYYY/M/D H:m:s').toDate(); // Your sheet format
       return {
@@ -37,8 +32,9 @@ async function fetchData() {
         L1_VA: parseFloat(row.L1_VA) || 0,
         L2_I_A: parseFloat(row.L2_I_A) || 0,
         L2_VA: parseFloat(row.L2_VA) || 0,
-        L1_Peak_I_A: parseFloat(row.L1_Peak_I_A) || 0, // Corrected column names
-        L2_Peak_I_A: parseFloat(row.L2_Peak_I_A) || 0, // Corrected column names
+        // Corrected column names for peak values
+        L1_Peak_I_A: parseFloat(row.L1_Peak_I_A) || 0,
+        L2_Peak_I_A: parseFloat(row.L2_Peak_I_A) || 0,
         Total_VA: parseFloat(row.Total_VA) || 0,
         Total_kVAh: parseFloat(row.Total_kVAh) || 0,
         Daily_kVAh: parseFloat(row.Daily_kVAh) || 0,
@@ -142,7 +138,7 @@ function drawLineChart(canvasId, labels, datasets, yAxisLabel = '') {
         tooltip: {
           callbacks: {
             title: function(context) {
-              return moment(context[0].label).format('MMM D, YYYY HH:mm');
+              return moment(context[0].label).format('MMM D,YYYY HH:mm');
             }
           }
         }
@@ -200,7 +196,7 @@ function drawBarChart(canvasId, labels, datasets, yAxisLabel = '') {
           callbacks: {
             title: function(context) {
                 if (canvasId === 'weeklyChart') {
-                    return moment(context[0].label).format('MMMM D, YYYY');
+                    return moment(context[0].label).format('MMMM D,YYYY');
                 }
                 return context[0].label;
             }
@@ -360,8 +356,8 @@ async function initializeDashboard(filterType = 'day', filterValue = null) {
 
   // Update current week range display
   const displayDate = moment(filterValue);
-  const currentWeekStart = displayDate.startOf('isoWeek').format('MMM D, YYYY');
-  const currentWeekEnd = displayDate.endOf('isoWeek').format('MMM D, YYYY');
+  const currentWeekStart = displayDate.startOf('isoWeek').format('MMM D,YYYY');
+  const currentWeekEnd = displayDate.endOf('isoWeek').format('MMM D,YYYY');
   document.getElementById('currentWeekRange').textContent = `(Week of ${currentWeekStart} - ${currentWeekEnd})`;
 }
 
@@ -378,7 +374,7 @@ function populateDateSelectors() {
     uniqueDates.forEach(dateStr => {
         const option = document.createElement('option');
         option.value = dateStr;
-        option.textContent = moment(dateStr).format('MMMM D, YYYY');
+        option.textContent = moment(dateStr).format('MMMM D,YYYY');
         dateInput.appendChild(option);
     });
 
@@ -395,7 +391,7 @@ function populateDateSelectors() {
         const option = document.createElement('option');
         const weekEnd = moment(weekStart).endOf('isoWeek').format('YYYY-MM-DD');
         option.value = weekStart;
-        option.textContent = `Week of ${moment(weekStart).format('MMM D')} - ${moment(weekEnd).format('MMM D, YYYY')}`;
+        option.textContent = `Week of ${moment(weekStart).format('MMM D')} - ${moment(weekEnd).format('MMM D,YYYY')}`;
         weekSelect.appendChild(option);
     });
 
@@ -422,8 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial load of the dashboard
   initializeDashboard();
 
-/* 
-// Setup auto-refresh every 60 seconds
+  // Setup auto-refresh every 60 seconds
   setInterval(() => {
     // Re-fetch all data and then re-initialize with current selection
     allData = []; // Clear current data to force a fresh fetch
@@ -445,5 +440,4 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeDashboard(); // Default to latest day if nothing selected
     }
   }, 60000); // Refresh every 60 seconds (60000 ms)
-  */
 });
