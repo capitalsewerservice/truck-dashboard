@@ -24,7 +24,23 @@ function drawLineChart(ctx, labels, datasets) {
   new Chart(ctx, {
     type: 'line',
     data: { labels, datasets },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    options: {
+  responsive: true,
+  scales: {
+    x: {
+      ticks: {
+        callback: function(val, index, ticks) {
+          const label = this.getLabelForValue(this.getLabels()[index]);
+          const time = new Date(label);
+          return time.toTimeString().split(' ')[0]; // HH:MM:SS
+        },
+        autoSkip: true,
+        maxTicksLimit: 10
+      }
+    },
+    y: { beginAtZero: true }
+  }
+}
   });
 }
 
@@ -32,7 +48,23 @@ function drawBarChart(ctx, labels, datasets) {
   new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    options: {
+  responsive: true,
+  scales: {
+    x: {
+      ticks: {
+        callback: function(val, index, ticks) {
+          const label = this.getLabelForValue(this.getLabels()[index]);
+          const time = new Date(label);
+          return time.toTimeString().split(' ')[0]; // HH:MM:SS
+        },
+        autoSkip: true,
+        maxTicksLimit: 10
+      }
+    },
+    y: { beginAtZero: true }
+  }
+}
   });
 }
 
