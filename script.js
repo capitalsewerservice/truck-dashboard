@@ -422,7 +422,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial load of the dashboard
   initializeDashboard();
 
-  // Setup auto-refresh every 60 seconds
+/* 
+// Setup auto-refresh every 60 seconds
   setInterval(() => {
     // Re-fetch all data and then re-initialize with current selection
     allData = []; // Clear current data to force a fresh fetch
@@ -444,4 +445,5 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeDashboard(); // Default to latest day if nothing selected
     }
   }, 60000); // Refresh every 60 seconds (60000 ms)
+  */
 });
