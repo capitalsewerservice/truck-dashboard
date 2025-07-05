@@ -1,8 +1,12 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbziMAnufvZPvGoNgLlUpsRXGuVJ7Pxf-mLbckKHRfMw8dTlaNbcqG0eJLvS_4RdKzCyaQ/exec";
 
+let allData = [];
+
 async function fetchData() {
   const response = await fetch(API_URL);
-  return await response.json();
+  const data = await response.json();
+  allData = data;
+  return data;
 }
 
 function processData(data) {
@@ -52,9 +56,12 @@ function drawGaugeChart(ctx, value) {
   });
 }
 
-async function drawCharts() {
-  const rawData = await fetchData();
-  const { timestamps, L1_VA, L2_VA, L1_peak, L2_peak, totalKVAh, dailyKVAh } = processData(rawData);
+function filterByDate(date) {
+  return allData.filter(entry => entry.Timestamp && entry.Timestamp.includes(date));
+}
+
+function drawCharts(filteredData) {
+  const { timestamps, L1_VA, L2_VA, L1_peak, L2_peak, totalKVAh, dailyKVAh } = processData(filteredData);
 
   drawLineChart(document.getElementById('vaChart'), timestamps, [
     { label: 'L1 VA', data: L1_VA, borderColor: 'blue', fill: false },
@@ -77,4 +84,24 @@ async function drawCharts() {
   drawGaugeChart(document.getElementById('liveGaugeChart'), L1_VA[L1_VA.length - 1] || 0);
 }
 
-drawCharts();
+async function initializeDashboard(dateFilter = null) {
+  const rawData = await fetchData();
+  const data = dateFilter ? filterByDate(dateFilter) : rawData;
+  drawCharts(data);
+}
+
+// Setup auto-refresh every 60 seconds
+setInterval(() => initializeDashboard(getSelectedDate()), 60000);
+
+// Get selected date from input
+function getSelectedDate() {
+  return document.getElementById('dateInput').value;
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('dateInput').addEventListener('change', () => {
+    initializeDashboard(getSelectedDate());
+  });
+  initializeDashboard();
+});
