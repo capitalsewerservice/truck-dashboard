@@ -1,6 +1,6 @@
 // --- Configuration ---
 // Replace with your actual Google Apps Script Web App URL
-const API_URL = "https://script.google.com/macros/s/AKfycbziMAnufvZPvGoNgLlUpsRXGuVJ7Pxf-mLbckKHRfMw8dTlaNbcqG0eJLvS_4RdKzCyaQ/exec"; // <--- REMEMBER TO REPLACE THIS!
+const API_URL = "https://script.google.com/macros/s/AKfycbziMAnufvZPvGoNgLlUpsRXGuVJ7Pxf-mLbckKHRfMw8dTlaNbcqG0eJLvS_4RdKzCyaQ/exec";
 
 let allData = []; // Stores all raw data fetched from the API
 let vaChartInstance = null; // To store Chart.js instances for updates
@@ -13,14 +13,20 @@ let gaugeChartInstance = null;
 async function fetchData() {
   try {
     const response = await fetch(API_URL);
-    const result = await response.json();
+    // Assuming the API returns a plain array directly, not an object with a 'data' key
+    const dataArray = await response.json(); 
 
-    if (result.error) {
-      throw new Error(`API Error: ${result.error}`);
+    // Basic validation: ensure we received an array
+    if (!Array.isArray(dataArray)) {
+        // If it's an object with an 'error' key, handle it
+        if (dataArray && typeof dataArray === 'object' && dataArray.error) {
+            throw new Error(`API Error: ${dataArray.error}`);
+        }
+        throw new Error("Invalid data format received from API. Expected a JSON array.");
     }
 
     // Process raw data: parse timestamps, convert numbers
-    const processedData = result.data.map(row => {
+    const processedData = dataArray.map(row => { // Now 'dataArray' is the array to map
       // Use moment.js to parse the specific timestamp format
       const timestamp = moment(row.Timestamp, 'YYYY/M/D H:m:s').toDate(); // Your sheet format
       return {
@@ -31,9 +37,8 @@ async function fetchData() {
         L1_VA: parseFloat(row.L1_VA) || 0,
         L2_I_A: parseFloat(row.L2_I_A) || 0,
         L2_VA: parseFloat(row.L2_VA) || 0,
-        // Corrected column names for peak values
-        L1_Peak_I_A: parseFloat(row.L1_Peak_I_A) || 0,
-        L2_Peak_I_A: parseFloat(row.L2_Peak_I_A) || 0,
+        L1_Peak_I_A: parseFloat(row.L1_Peak_I_A) || 0, // Corrected column names
+        L2_Peak_I_A: parseFloat(row.L2_Peak_I_A) || 0, // Corrected column names
         Total_VA: parseFloat(row.Total_VA) || 0,
         Total_kVAh: parseFloat(row.Total_kVAh) || 0,
         Daily_kVAh: parseFloat(row.Daily_kVAh) || 0,
