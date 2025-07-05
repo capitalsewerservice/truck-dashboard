@@ -13,15 +13,16 @@ let gaugeChartInstance = null;
 async function fetchData() {
   try {
     const response = await fetch(API_URL);
-    // Assuming the API returns an object with a 'data' key as confirmed previously
-    const result = await response.json();
+    // ASSUMING THE API RETURNS AN OBJECT WITH A 'data' KEY, e.g., { "data": [...] }
+    const result = await response.json(); 
 
     if (result.error) {
       throw new Error(`API Error: ${result.error}`);
     }
 
     // Process raw data: parse timestamps, convert numbers
-    const processedData = result.data.map(row => {
+    // This line correctly accesses the 'data' array from the returned object
+    const processedData = result.data.map(row => { 
       // Use moment.js to parse the specific timestamp format
       const timestamp = moment(row.Timestamp, 'YYYY/M/D H:m:s').toDate(); // Your sheet format
       return {
@@ -418,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial load of the dashboard
   initializeDashboard();
 
-  // Setup auto-refresh every 60 seconds
+  // Setup auto-refresh every 60 seconds (re-enabled as it was not the cause of the glitch)
   setInterval(() => {
     // Re-fetch all data and then re-initialize with current selection
     allData = []; // Clear current data to force a fresh fetch
