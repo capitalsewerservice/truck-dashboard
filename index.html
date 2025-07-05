@@ -6,35 +6,40 @@
   <title>Truck Power Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1>Truck Power Monitoring Dashboard</h1>
     <div class="toolbar">
-      <label for="dateInput">Select Date:</label>
+      <label for="dateInput">Select Day:</label>
       <input type="date" id="dateInput" />
+
+      <label for="weekSelect" style="margin-left: 20px;">Select Week:</label>
+      <select id="weekSelect"></select>
+      <span id="currentWeekRange" style="margin-left: 10px; font-weight: bold;"></span>
     </div>
   </header>
 
   <main class="grid-container">
     <section class="card">
-      <h2>Voltage / VA (L1 & L2)</h2>
+      <h2>Daily L1 & L2 VA Progressive Consumption</h2>
       <canvas id="vaChart"></canvas>
     </section>
 
     <section class="card">
-      <h2>Peak Current (L1 & L2)</h2>
+      <h2>Daily L1 & L2 VA Peak Consumption</h2>
       <canvas id="peakChart"></canvas>
     </section>
 
     <section class="card">
-      <h2>Total kVAh</h2>
+      <h2>Daily kVAh Consumption</h2>
       <canvas id="kvahChart"></canvas>
     </section>
 
     <section class="card">
-      <h2>Daily kVAh (Weekly Trend)</h2>
+      <h2>Weekly kVAh Statistics</h2>
       <canvas id="weeklyChart"></canvas>
     </section>
 
