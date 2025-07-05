@@ -67,8 +67,6 @@ footer {
 
 canvas {
   max-width: 100%;
-  /* Removed fixed height to let ResponsiveContainer handle it */
-  /* Chart.js's responsive: true in options combined with maintainAspectRatio: false in options */
-  /* will make it fill parent container height. You might set a min-height for canvases here if needed */
-  height: 250px; /* Example fixed height for all charts, adjust as needed */
+  /* This fixed height is crucial for controlling chart growth */
+  height: 250px; /* Adjust this value as needed for your desired chart height */
 }
